@@ -10,9 +10,9 @@ const Header = () => {
         </div>
         <div className="hidden md:flex text-xl mx-auto my-auto">
             <ul className="flex border-b border-zinc-800 font-minecraft text-xl list-none gap-6 pt-8 pb-2">
-                <li className="cursor-pointer hover:text-zinc-700 transition-all ">markets</li>
-                <li className="cursor-pointer hover:text-zinc-700 transition-all ">favs</li>
-                <li className="cursor-pointer hover:text-zinc-700 transition-all ">analysis</li>
+                <li onClick={()=>{navigate("/martkets")}} className="cursor-pointer hover:text-zinc-700 transition-all ">markets</li>
+                <li onClick={()=>{navigate("/favs")}} className="cursor-pointer hover:text-zinc-700 transition-all ">favs</li>
+                <li onClick={()=>{navigate("/profile")}} className="cursor-pointer hover:text-zinc-700 transition-all ">Profile</li>
             </ul>
         </div>
         <div className='pt-4 mx-auto my-auto'>
