@@ -28,19 +28,19 @@ export const predictSymbols = async (req: Request, res:Response)=>{
         const coinData = getPrices()[symbol]
         if (!coinData) res.status(404).json({meesage: `No data for symbol, ${symbol}`})
 
-        const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [{
-                role: "system",
-                content: "You are a crypto market analyst. Given news sentiment, social sentiment, and price data for a cryptocurrency, predict whether the price will go UP (COP) or DOWN (DROP) in the short term. Return ONLY valid JSON. No markdown, no explanation outside the JSON."
-            },
-            {
-                role: "user",
-                content: `Analyze this data and return a prediction:\n\nSymbol: ${symbol}\nCurrent Price: $${symbolData.price}\n24h Change: ${symbolData.changePct}%\nNews Score (0-1): ${newsSentiment.newsScore}\nBullish Articles: ${bullishPercent}%\nBearish Articles: ${bearishPercent}%\nBuzz Level (0-1): ${buzz}\n\nRespond with this exact format:\n{\n  "symbol": "${symb}",\n  "prediction": "COP or DROP",\n  "confidence": (0-100),\n  "reasoning": "One sentence explaining the key driver"\n}`
-            }
-        ]
+        // const response = await openai.chat.completions.create({
+        //     model: "gpt-4o-mini",
+        //     messages: [{
+        //         role: "system",
+        //         content: "You are a crypto market analyst. Given news sentiment, social sentiment, and price data for a cryptocurrency, predict whether the price will go UP (COP) or DOWN (DROP) in the short term. Return ONLY valid JSON. No markdown, no explanation outside the JSON."
+        //     },
+        //     {
+        //         role: "user",
+        //         content: `Analyze this data and return a prediction:\n\nSymbol: ${symbol}\nCurrent Price: $${symbolData.price}\n24h Change: ${symbolData.changePct}%\nNews Score (0-1): ${newsSentiment.newsScore}\nBullish Articles: ${bullishPercent}%\nBearish Articles: ${bearishPercent}%\nBuzz Level (0-1): ${buzz}\n\nRespond with this exact format:\n{\n  "symbol": "${symb}",\n  "prediction": "COP or DROP",\n  "confidence": (0-100),\n  "reasoning": "One sentence explaining the key driver"\n}`
+        //     }
+        // ]
             
-        })
+        // })
         // res.json({newsSentiment, socialSentiment})
     } catch (error) {
         res.status(501).json({message: "Analysis failed", error: (error as Error).message})
