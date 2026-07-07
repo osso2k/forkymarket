@@ -9,6 +9,7 @@ import { apiServer } from './ws/api';
 import { protectedRoute } from './middleware/authMiddleware';
 import favsRouter from './routes/favsRoutes';
 import newsRouter from './routes/newsRoutes';
+import analysisRouter from './routes/analysisRouets';
 
 dotenv.config()
 
@@ -31,6 +32,7 @@ apiServer(wss)
 app.use('/api/auth',authRouter)
 app.use('/api/app',protectedRoute,favsRouter)
 app.use('/api/news', protectedRoute, newsRouter)
+app.use('/api/analysis', protectedRoute, analysisRouter)
 server.listen(PORT, ()=>{
     console.log(`Server is Live on port: ${PORT}`);
 })
