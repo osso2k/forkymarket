@@ -9,7 +9,7 @@ import { apiServer } from './ws/api';
 import { protectedRoute } from './middleware/authMiddleware';
 import favsRouter from './routes/favsRoutes';
 import newsRouter from './routes/newsRoutes';
-import analysisRouter from './routes/analysisRouets';
+import analysisRouter from './routes/analysisRoutes';
 
 dotenv.config()
 
