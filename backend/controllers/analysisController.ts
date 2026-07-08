@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import finnhub from "finnhub"
+// import finnhub from "finnhub"
 import OpenAI from "openai"
 import { getPrices } from "../stores/pricesStore"
 
@@ -8,44 +8,73 @@ const openai = new OpenAI({
     baseURL: "https://openrouter.ai/api/v1"
 })
 
-const {DefaultApi} = finnhub
-const finnhubClient = new DefaultApi(process.env.FINNHUB_API_KEY!)
+// const {DefaultApi} = finnhub
+// const finnhubClient = new DefaultApi(process.env.FINNHUB_API_KEY!)
 
 export const predictSymbols = async (req: Request, res:Response)=>{
     const { symbol } = req.body
 
-    if (!symbol) res.status(400).json({message: "Symbol is required"})
-
-    // let finalThoughts : Record<string, string[]> = ({})
+    if (!symbol) return res.status(400).json({message: "Symbol is required"})
 
     try {
-        const newsSentiment = await fetch(`https://finnhub.io/api/v1/news-sentiment?symbol=${symbol}&token=${process.env.FINNHUB_API_KEY}`)
-        const newsData = newsSentiment.json()
-        const socialSentiment = await fetch(`https://finnhub.io/api/v1/social-sentiment?symbol=${symbol}&token=${process.env.FINNHUB_API_KEY}`)
-        const socialData = socialSentiment.json()
+        // const newsSentiment = await fetch(`https://finnhub.io/api/v1/news-sentiment?symbol=${symbol}&token=${process.env.FINNHUB_API_KEY}`)
+        // const socialSentiment = await fetch(`https://finnhub.io/api/v1/social-sentiment?symbol=${symbol}&token=${process.env.FINNHUB_API_KEY}`)
+
+        // const newsData = await newsSentiment.json()
+        // const socialData = await socialSentiment.json()
 
 
         const coinData = getPrices()[symbol]
-        if (!coinData) res.status(404).json({meesage: `No data for symbol, ${symbol}`})
-
-        // const response = await openai.chat.completions.create({
-        //     model: "gpt-4o-mini",
-        //     messages: [{
-        //         role: "system",
-        //         content: "You are a crypto market analyst. Given news sentiment, social sentiment, and price data for a cryptocurrency, predict whether the price will go UP (COP) or DOWN (DROP) in the short term. Return ONLY valid JSON. No markdown, no explanation outside the JSON."
-        //     },
-        //     {
-        //         role: "user",
-        //         content: `Analyze this data and return a prediction:\n\nSymbol: ${symbol}\nCurrent Price: $${symbolData.price}\n24h Change: ${symbolData.changePct}%\nNews Score (0-1): ${newsSentiment.newsScore}\nBullish Articles: ${bullishPercent}%\nBearish Articles: ${bearishPercent}%\nBuzz Level (0-1): ${buzz}\n\nRespond with this exact format:\n{\n  "symbol": "${symb}",\n  "prediction": "COP or DROP",\n  "confidence": (0-100),\n  "reasoning": "One sentence explaining the key driver"\n}`
-        //     }
-        // ]
-            
-        // })
-        // res.json({newsSentiment, socialSentiment})
+        if (!coinData) return res.status(404).json({message: `No data for symbol, ${symbol}`})
+        
+        try {
+            let headlines = "No recent news..."
+            try {
+                const newsRes = await fetch( `https://finnhub.io/api/v1/news?category=crypto&apikey=${process.env.FINNHUB_API_KEY}`)
+                if (newsRes.ok){
+                    const news = await newsRes.json()
+                    headlines = news.slice(0,5).map((n: any) => n.headline).join("\n")
+                }
+            } catch (error) {
+                return res.status(500).json({message: "Couldnt get news for symbol" , err: (error as Error).message})
+            }
+            const response = await openai.chat.completions.create({
+                model: "openai/gpt-4o-mini",
+                messages: [
+                  {
+                    role: "system",
+                    content: "You are a crypto analyst. Given price data and news, predict COP (up) or DROP (down). Return only valid JSON.",
+                  },
+                  {
+                    role: "user",
+                    content: `Symbol: ${symbol}\nPrice: $${coinData.price}\n24h Change: ${coinData.changePct}%\nVolume: ${coinData.volume} USDT\n\nNews:\n${headlines}\n\nReturn JSON: { "prediction": "COP or DROP", "confidence": 0-100, "reasoning": "2 lines of reason" }`,
+                  },
+                ],
+                response_format: { type: "json_object" },
+              })
+              const result = await JSON.parse(response.choices[0].message.content!)
+              res.json({symbol, ...result})
+        } catch (error) {
+            res.status(500).json({message: "Analysis Failed", err:(error as Error).message})
+        }
     } catch (error) {
         res.status(501).json({message: "Analysis failed", error: (error as Error).message})
     }
 }
-export const analysisChat = async ()=>{
+export const analysisChat = async (req: Request, res: Response)=>{
+    const {symbol , messages } = req.body
+    if(!symbol || !messages) return res.status(400).json({message: "Invalid Information"})
 
+    const coinData = getPrices()[symbol]
+    if (!coinData) return res.status(400).json({message: "Data not Found"})
+    
+    const contextMsg = {
+        role: "system",
+        content: `Current data for ${symbol}: Price ${coinData.price}, 24h Change ${coinData.changePct}. Be concise, and very thoughtdful for the user.`
+    }
+    const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [contextMsg, ...messages]
+    })
+    res.json({reply: response.choices[0].message.content})
 }
