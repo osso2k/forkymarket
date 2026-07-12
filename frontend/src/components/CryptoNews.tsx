@@ -37,9 +37,9 @@ const CryptoNews = () => {
 
     return () => clearInterval(inteval)
   },[news])
-  const visibleNews = [news[startIndex], news[(startIndex + 1) % news.length],].filter(Boolean)
+  const visibleNews = [news[startIndex], news[startIndex + 1]].filter(Boolean)
   return (
-    <div className="max-h-full flex flex-fit w-full font-sans">
+    <div className="flex min-w-full font-sans mt-1">
       {news.length > 0 ? <><div className="">
       <AnimatePresence mode="wait">
         <motion.div
@@ -55,9 +55,9 @@ const CryptoNews = () => {
           {visibleNews.map((item) => (
             <div
               key={item.id}
-              className="mb-3 rounded-lg p-3"
+              className=" w-full my-auto mb-3 rounded-lg p-3"
             >
-              <h3 className="font-semibold text-[14px] lg:text-md">{item.headline}</h3>
+              <h3 className="font-semibold text-[14px] lg:text-md line-clamp-2">{item.headline}</h3>
               <p className="text-xm font-sans">
                 {new Date(item.datetime * 1000).toLocaleDateString("en-US", {
                   month: "short",

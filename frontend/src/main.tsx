@@ -11,6 +11,7 @@ import Homepage from './pages/Homepage.tsx'
 import Favs from './pages/Favs.tsx'
 import Profile from './pages/Profile.tsx'
 import Header from './components/Header.tsx'
+// import Ribbons from './techs/Ribbons.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <div className='flex flex-col min-h-screen w-full bg-[hsl(280,26%,9%)] text-white font-minecraft'>
@@ -18,6 +19,14 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter >
     <Toaster />
     <Header />
+    {/* <Ribbons
+    baseThickness={10}
+    colors={["#5227FF"]}
+    speedMultiplier={0.5}
+    maxAge={500}
+    enableFade={false}
+    enableShaderEffect={false}
+  /> */}
       <Routes>
         <Route path='/' element={<Protected><App /></Protected>} />
         <Route path='/markets' element={<Protected><Homepage /></Protected>} />

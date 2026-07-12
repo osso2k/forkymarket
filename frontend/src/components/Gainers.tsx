@@ -8,8 +8,8 @@ const Gainers = () => {
     const losers = [...top7].sort(([,a], [,b]) => Number(a.changePct) - Number(b.changePct)).slice(0,2)
     const display = [...gainers, ...losers]
   return (
-    <div className="h-full w-[70%] mx-auto border-t border-zinc-700">
-        <h1 className="text-center font-minecraft font-semibold text-lg md:text-2xl mt-4 mb-4 pt-1">Todays Gainers and losers</h1>
+    <div className="h-full w-[80%] mx-auto">
+        <h1 className="text-center font-minecraft border-b border-zinc-700 font-semibold text-lg md:text-2xl mt-4 mb-4 pb-4 pt-1">Todays Gainers and losers</h1>
         {display.length > 0 ? display.map(([symbol, price]) => (
             <div key={symbol} className="flex justify-center my-1">
                 <p className="pr-4 font-sans text-xl flex my-auto">{symbol.replace("USDT", "")}</p>
