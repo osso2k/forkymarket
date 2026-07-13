@@ -10,7 +10,8 @@ import { Protected, ProtectedAuth } from './components/Protected.tsx'
 import Homepage from './pages/Homepage.tsx'
 import Favs from './pages/Favs.tsx'
 import Profile from './pages/Profile.tsx'
-import Header from './components/Header.tsx'
+// import Header from './components/Header.tsx'
+import Layout from './components/Layout.tsx'
 // import Ribbons from './techs/Ribbons.tsx'
 
 createRoot(document.getElementById('root')!).render(
@@ -18,7 +19,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter >
     <Toaster />
-    <Header />
+    {/* <Header /> */}
     {/* <Ribbons
     baseThickness={10}
     colors={["#5227FF"]}
@@ -26,12 +27,14 @@ createRoot(document.getElementById('root')!).render(
     maxAge={500}
     enableFade={false}
     enableShaderEffect={false}
-  /> */}
-      <Routes>
+    /> */}
+      <Routes >
+        <Route element={<Layout />}>
         <Route path='/' element={<Protected><App /></Protected>} />
         <Route path='/markets' element={<Protected><Homepage /></Protected>} />
         <Route path='/favs' element={<Protected><Favs /></Protected>} />
         <Route path='/profile' element={<Protected><Profile /></Protected>} />
+        </Route>
         <Route path='/signup' element={<ProtectedAuth><Signup /></ProtectedAuth>} />
         <Route path='/login' element={<ProtectedAuth><Login /></ProtectedAuth>} />
       </Routes>

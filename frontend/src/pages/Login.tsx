@@ -52,11 +52,11 @@ const Login = () => {
               <form onSubmit={handleSubmit} action="">
                   <div className="flex pl-[20%] p-1">  
                       <label className="font-minecraft my-auto pr-3" >username: </label>
-                      <input onChange={handleChange} name="username" value={form.username} className="text-black text-lg pl-2 h-10 border border-black w-[50%] bg-white rounded-lg" type="text" />
+                      <input  onChange={handleChange} name="username" autoComplete="off" value={form.username} className=" text-md focus:border-violet-500 focus:ring-2 transition-all duration-200 text-white placeholder:text-zinc-500 pl-2 h-10 border-2  border-black w-[50%] bg-zinc-800 rounded-lg" type="text" />
                   </div>
                   <div className="flex pl-[20%] p-1">  
                       <label className="font-minecraft my-auto pr-3" >password: </label>
-                      <input onChange={handleChange} name="password" value={form.password} className="text-black text-lg pl-2 h-10 border border-black w-[50%] bg-white rounded-lg" type="password" />
+                      <input onChange={handleChange} name="password" autoComplete="off" value={form.password} className=" text-md focus:border-violet-500 focus:ring-2 transition-all duration-200 text-white placeholder:text-zinc-500 pl-2 h-10 border-2  border-black w-[50%] bg-zinc-800 rounded-lg" type="password" />
                   </div>
                   <button className="flex mx-auto mt-2  pt-2 text-xl rounded-2xl px-6 cursor-pointer my-auto py-1 text-center font-minecraft border bg-purple-900/45" type="submit">Login</button>
               </form>

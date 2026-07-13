@@ -1,4 +1,4 @@
-import { usePricesStore } from "../stores/usePricesStore"
+import { usePricesStore } from "../../stores/usePricesStore"
 
 
 const DisplayTop7 = () => {

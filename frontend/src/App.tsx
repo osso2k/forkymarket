@@ -1,5 +1,5 @@
 import AiAnalysis from "./components/AiAnalysis"
-import OpeningCard from "./components/OpeningCard"
+import OpeningCard from "./components/Markets/OpeningCard"
 
 
 const App = () => {

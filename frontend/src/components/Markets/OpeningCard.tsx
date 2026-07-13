@@ -1,4 +1,4 @@
-import BorderGlow from "../techs/BorderGlow"
+import BorderGlow from "../../techs/BorderGlow"
 import CryptoNews from "./CryptoNews"
 import DisplayTop7 from "./DisplayTop7"
 import Gainers from "./Gainers"
