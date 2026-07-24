@@ -12,10 +12,31 @@ import Favs from './pages/Favs.tsx'
 import Profile from './pages/Profile.tsx'
 // import Header from './components/Header.tsx'
 import Layout from './components/Layout.tsx'
+import Ferrofluid from './techs/FerroFluids.tsx'
 // import Ribbons from './techs/Ribbons.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <div className='flex flex-col min-h-screen w-full bg-[hsl(280,26%,9%)] text-white font-minecraft'>
+  <div className='relative  min-h-screen w-full bg-[hsl(280,26%,9%)] text-white font-minecraft'>
+<div className='absolute inset-0 z-0 pointer-events-none overflow-hidden'>
+      <Ferrofluid
+        colors={["#9c38eb","#5b4768","#b7b2bb"]}
+        speed={0.3}
+        scale={1.5}
+        turbulence={1}
+        fluidity={0.18}
+        rimWidth={0.23}
+        sharpness={2.5}
+        shimmer={1.15}
+        glow={2.6}
+        flowDirection="left"
+        opacity={0.4}
+        mouseInteraction
+        mouseStrength={1}
+        mouseRadius={0.35}
+      />
+    </div>
+  <div className='relative z-10'>
+
   <StrictMode>
     <BrowserRouter >
     <Toaster />
@@ -40,5 +61,6 @@ createRoot(document.getElementById('root')!).render(
       </Routes>
     </BrowserRouter>
   </StrictMode>
+    </div>
   </div>
 )

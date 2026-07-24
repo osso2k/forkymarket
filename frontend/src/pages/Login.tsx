@@ -42,8 +42,8 @@ const Login = () => {
         }
     }
     return (
-      <div className="flex w-full h-full mt-40">
-          <div className="flex flex-col flex-wrap mx-auto h-[500px] w-[40%] shadow shadow-zinc-800 rounded-lg ">
+        <div className="flex w-full h-screen">
+          <div className="flex flex-col flex-wrap mx-auto my-auto h-125 w-[40%] shadow shadow-zinc-800 rounded-lg ">
           <div className="flex justify-between">
                 <h1 className="font-minecraft text-2xl pt-12 pl-10">Forkymarket</h1>
                 <p className="font-mono text-lg my-auto pt-7 pr-10  text-zinc-600">Log In</p>
