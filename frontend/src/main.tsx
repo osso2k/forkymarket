@@ -35,7 +35,7 @@ createRoot(document.getElementById('root')!).render(
         mouseRadius={0.35}
       />
     </div>
-  <div className='relative z-10'>
+  <div className='relative z-4'>
 
   <StrictMode>
     <BrowserRouter >
