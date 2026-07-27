@@ -20,8 +20,15 @@ const AiAnalysis = () => {
   // },[])
 
   return (
-    <div className="flex flex-col w-full h-full">
-      <h1>Market Pulse </h1>
+    <div className="flex flex-col w-full h-full mt-12 mb-3">
+      <h1 className="text-2xl mx-auto">Market Pulse </h1>
+      <div className="shadow-md shadow-mauve-800 w-[60%] h-[90%] mx-auto">
+        <div className="flex gap-1 mx-auto w-full justify-center mt-4">
+          <input className="bg-zinc-700 w-[50%] h-9 rounded pl-3 " type="text" placeholder="🔍Search for a coin..." />
+          <button className="px-4 py-1 bg-mauve-700 border">Analyze</button>
+        </div>
+      </div>
+
     </div>
   )
 }
