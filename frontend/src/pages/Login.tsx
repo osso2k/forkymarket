@@ -26,7 +26,8 @@ const Login = () => {
             const response = await api.post("/api/auth/login", form)
             if(response){
                 toast.success("Logged in!")
-                localStorage.setItem("userId", response.data.user)
+                localStorage.setItem("userId", response.data.user.userID)
+                localStorage.setItem("user", JSON.stringify(response.data.user))
                 localStorage.setItem("token", response.data.token)
                 navigate("/")
                 return

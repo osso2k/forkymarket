@@ -40,7 +40,7 @@ export const signup = async (req: Request<{},{},User> ,res:Response) =>{
         const user = await pool.query("INSERT INTO users (username , hashed_password) VALUES ($1,$2) RETURNING id",[username, hashedPassword])
         //const token = //gen token wioth id
         const token = generateToken(user.rows[0].id)
-        res.status(201).json({message:"User Created Successfully!",user:user.rows[0].id ,token})
+        res.status(201).json({message:"User Created Successfully!", user:{userID: user.rows[0].id, username: user.rows[0].username, createdAt: user.rows[0].created_at  }  ,token})
     } catch (error) {
         res.status(500).json({message:"Something went wrong in signing up...",err:(error as Error).message})
     }
@@ -63,7 +63,7 @@ export const login = async (req:Request<{},{},User>,res:Response)=>{
         }
         //gen token
         const token= generateToken(user.rows[0].id)
-        res.json({message:"Successfully logged in!", user:user.rows[0].id  , token })
+        res.json({message:"Successfully logged in!", user:{userID: user.rows[0].id, username: user.rows[0].username, createdAt: user.rows[0].created_at  } , token })
     } catch (error) {
         res.status(500).json({message:"Something went wrong in logging in...", err: (error as Error).message})
     }
