@@ -16,7 +16,7 @@ import Ferrofluid from './techs/FerroFluids.tsx'
 // import Ribbons from './techs/Ribbons.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <div className='relative  min-h-screen w-full bg-[hsl(280,26%,9%)] text-white font-minecraft'>
+  <div className='relative min-h-screen w-full bg-[hsl(280,26%,9%)] text-white font-minecraft'>
 <div className='absolute inset-0 z-0 pointer-events-none overflow-hidden'>
       <Ferrofluid
         colors={["#9c38eb","#5b4768","#b7b2bb"]}

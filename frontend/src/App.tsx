@@ -4,7 +4,7 @@ import OpeningCard from "./components/Markets/OpeningCard"
 
 const App = () => {
   return(
-    <div className="flex flex-col shrink h-screen w-full">
+    <div className="flex flex-col shrink flex-1 w-full">
       <OpeningCard />
       <AiAnalysis />
     </div>
