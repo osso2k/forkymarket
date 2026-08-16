@@ -133,7 +133,7 @@ const AiAnalysis = () => {
 
           <button
             disabled={!selected}
-            className="px-4 py-1 bg-mauve-700 border disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-4 py-1 bg-mauve-700 border disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             Analyze
           </button>
