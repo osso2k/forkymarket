@@ -11,6 +11,7 @@ import favsRouter from './routes/favsRoutes';
 import newsRouter from './routes/newsRoutes';
 import analysisRouter from './routes/analysisRoutes';
 
+
 dotenv.config()
 
 const app = express()
@@ -33,6 +34,10 @@ app.use('/api/auth',authRouter)
 app.use('/api/app',protectedRoute,favsRouter)
 app.use('/api/news', protectedRoute, newsRouter)
 app.use('/api/analysis', protectedRoute, analysisRouter)
+
+
+
 server.listen(PORT, ()=>{
-    console.log(`Server is Live on port: ${PORT}`);
+    const hour = new Date().toTimeString()
+    console.log(`Server is Live on port: ${PORT}`, hour.slice(0,2));
 })

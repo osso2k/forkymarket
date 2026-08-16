@@ -1,36 +1,146 @@
-// import { useEffect, useState } from "react";
-// import { usePricesStore } from "../stores/usePricesStore";
+import { useState, useRef, useEffect } from "react";
+import { usePricesStore } from "../stores/usePricesStore";
 
 // interface Results {
 //     prediction: string;
 //     confidence: string;
 //     reasoning: string;
 // }
+
+function highlightMatch(text: string, query: string) {
+  if (!query) return text;
+  const idx = text.toUpperCase().indexOf(query.toUpperCase());
+  if (idx === -1) return text;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <span className="text-mauve-400 font-semibold">
+        {text.slice(idx, idx + query.length)}
+      </span>
+      {text.slice(idx + query.length)}
+    </>
+  );
+}
+
 const AiAnalysis = () => {
+  const [search, setSearch] = useState<string>("");
+  const [selected, setSelected] = useState<string | null>(null);
+  const [highlighted, setHighlighted] = useState(0);
+  const [open, setOpen] = useState(false);
+  const prices = usePricesStore();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const matches = search.trim()
+    ? Object.keys(prices)
+        .filter((s) => s.includes(search.trim().toUpperCase()))
+        .slice(0, 5)
+    : [];
+
   // const [results, setResults] = useState<Record<string, Results[]>>({})
   // const [loading, setLoading] = useState<boolean>(false)
   // const [activeChat, setActiveChat] = useState<string | null>()
   // const [chatHistory, setChatHistory] = useState<Record<string, Array<{role: string, content:string}>>>({})
   // const [chatInput, setChatInput] = useState<string>("")
 
-  // useEffect(()=>{
-  //   // const prices = usePricesStore()
-  //   // const updatedPrices = Object.entries(prices).sort(([,a],[,b]) => Number(b.volume) - Number(a.volume)).slice(0,7).sort(([,a], [,b])=> Number(b.price) - Number(a.price))
-    
-  // },[])
+  useEffect(() => {
+    setHighlighted(0);
+  }, [search]);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setSelected(null);
+    setOpen(true);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!open || matches.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlighted((h) => Math.min(h + 1, matches.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlighted((h) => Math.max(h - 1, 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      selectSymbol(matches[highlighted]);
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
+  };
+
+  const selectSymbol = (symbol: string) => {
+    setSearch(symbol.replace("USDT", ""));
+    setSelected(symbol);
+    setOpen(false);
+  };
 
   return (
     <div className="flex flex-col w-full h-full mt-12 mb-3">
       <h1 className="text-2xl mx-auto">Market Pulse </h1>
-      <div className="shadow-md shadow-mauve-800 w-[60%] h-[90%] mx-auto">
-        <div className="flex gap-1 mx-auto w-full justify-center mt-4">
-          <input className="bg-zinc-700 w-[50%] h-9 rounded pl-3 " type="text" placeholder="🔍Search for a coin..." />
-          <button className="px-4 py-1 bg-mauve-700 border">Analyze</button>
+      <div className=" w-[60%] h-[90%] mx-auto">
+        <div ref={containerRef} className="relative flex gap-1 mx-auto w-full justify-center mt-4">
+          <div className="relative w-[50%]">
+            <input
+              onChange={handleChange}
+              onFocus={() => search && setOpen(true)}
+              onKeyDown={handleKeyDown}
+              value={search}
+              role="combobox"
+              aria-expanded={open}
+              className="bg-zinc-700 w-full h-9 rounded pl-3"
+              type="text"
+              placeholder="🔍Search for a coin..."
+            />
+
+            {open && search.trim() && (
+              <div
+                role="listbox"
+                className="absolute z-10 mt-1 w-full overflow-hidden rounded bg-zinc-700 shadow-md shadow-mauve-600"
+              >
+                {matches.length > 0 ? (
+                  matches.map((symbol, i) => (
+                    <div
+                      key={symbol}
+                      role="option"
+                      aria-selected={highlighted === i}
+                      onMouseEnter={() => setHighlighted(i)}
+                      onClick={() => selectSymbol(symbol)}
+                      className={`cursor-pointer px-3 py-2 text-sm transition-colors ${
+                        highlighted === i ? "bg-zinc-600" : ""
+                      }`}
+                    >
+                      {highlightMatch(symbol.replace("USDT", ""), search.trim())}
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-sm text-zinc-400">
+                    No matches for "{search}"
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <button
+            disabled={!selected}
+            className="px-4 py-1 bg-mauve-700 border disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Analyze
+          </button>
         </div>
       </div>
-
     </div>
-  )
-}
+  );
+};
 
-export default AiAnalysis
+export default AiAnalysis;
