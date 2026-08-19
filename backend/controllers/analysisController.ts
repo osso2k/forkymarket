@@ -12,7 +12,7 @@ const openai = new OpenAI({
 // const finnhubClient = new DefaultApi(process.env.FINNHUB_API_KEY!)
 
 export const predictSymbols = async (req: Request, res:Response)=>{
-    const { symbol } = req.body
+    const { symbol } = req.body ?? {}
 
     if (!symbol) return res.status(400).json({message: "Symbol is required"})
 

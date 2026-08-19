@@ -1,11 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { usePricesStore } from "../stores/usePricesStore";
+import toast from "react-hot-toast";
+import api from "../api";
+import AiResultsCard from "./Markets/AiResultsCard";
 
-// interface Results {
-//     prediction: string;
-//     confidence: string;
-//     reasoning: string;
-// }
+interface Prediction {
+  symbol: string;
+  prediction: string;
+  reasoning: string;
+  confidence: number;
+}
 
 function highlightMatch(text: string, query: string) {
   if (!query) return text;
@@ -27,6 +31,7 @@ const AiAnalysis = () => {
   const [selected, setSelected] = useState<string | null>(null);
   const [highlighted, setHighlighted] = useState(0);
   const [open, setOpen] = useState(false);
+  const [data,setData] = useState<Prediction | null>(null)
   const prices = usePricesStore();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -84,6 +89,19 @@ const AiAnalysis = () => {
     setOpen(false);
   };
 
+
+  const handleAnalyze = async () => {
+    try {
+      const response = await api.post("/api/analysis/predict", {symbol:selected})
+      const predic = await response.data
+      setData(predic)
+      console.log(response);
+    } catch (error) {
+      toast.error("OOPS!! Something went wrong.")
+      console.log((error as Error).message);
+    }
+  }
+
   return (
     <div className="flex flex-col w-full h-full mt-12 mb-3">
       <h1 className="text-2xl mx-auto">Market Pulse </h1>
@@ -133,11 +151,15 @@ const AiAnalysis = () => {
 
           <button
             disabled={!selected}
+            onClick={handleAnalyze}
             className="px-4 py-1 bg-mauve-700 border disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             Analyze
           </button>
         </div>
+      </div>
+      <div>
+        {data && <AiResultsCard {...data} />}
       </div>
     </div>
   );

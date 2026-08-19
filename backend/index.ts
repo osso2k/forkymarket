@@ -38,6 +38,5 @@ app.use('/api/analysis', protectedRoute, analysisRouter)
 
 
 server.listen(PORT, ()=>{
-    const hour = new Date().toTimeString()
-    console.log(`Server is Live on port: ${PORT}`, hour.slice(0,2));
+    console.log(`Server is Live on port: ${PORT}`);
 })
