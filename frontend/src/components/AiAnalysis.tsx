@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { usePricesStore } from "../stores/usePricesStore";
 import toast from "react-hot-toast";
 import api from "../api";
 import AiResultsCard from "./Markets/AiResultsCard";
@@ -32,18 +31,25 @@ const AiAnalysis = () => {
   const [highlighted, setHighlighted] = useState(0);
   const [open, setOpen] = useState(false);
   const [data,setData] = useState<Prediction | null>(null)
-  const prices = usePricesStore();
+  const [loading, setLoading] = useState<boolean>(false)
+  const [allSymbols, setAllSymbols] = useState<string[]>([])
+
+  useEffect(() => {
+    fetch("https://api.binance.com/api/v3/exchangeInfo")
+      .then(res => res.json())
+      .then(data => {
+        const symbols = data.symbols
+          .filter((s: any) => s.status === "TRADING" && s.quoteAsset === "USDT")
+          .map((s: any) => s.symbol)
+        setAllSymbols(symbols)
+      })
+  }, [])
+
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const matches = search.trim()
-    ? Object.keys(prices)
-        .filter((s) => s.includes(search.trim().toUpperCase()))
-        .slice(0, 5)
-    : [];
+  const matches = search.trim() ? allSymbols.filter((s) => s.includes(search.trim().toUpperCase())).slice(0, 5) : [];
 
-  // const [results, setResults] = useState<Record<string, Results[]>>({})
-  // const [loading, setLoading] = useState<boolean>(false)
-  // const [activeChat, setActiveChat] = useState<string | null>()
+    // const [activeChat, setActiveChat] = useState<string | null>()
   // const [chatHistory, setChatHistory] = useState<Record<string, Array<{role: string, content:string}>>>({})
   // const [chatInput, setChatInput] = useState<string>("")
 
@@ -92,7 +98,9 @@ const AiAnalysis = () => {
 
   const handleAnalyze = async () => {
     try {
+      setLoading(true)
       const response = await api.post("/api/analysis/predict", {symbol:selected})
+      setLoading(false)
       const predic = await response.data
       setData(predic)
       console.log(response);
@@ -128,15 +136,7 @@ const AiAnalysis = () => {
                 {matches.length > 0 ? (
                   matches.map((symbol, i) => (
                     <div
-                      key={symbol}
-                      role="option"
-                      aria-selected={highlighted === i}
-                      onMouseEnter={() => setHighlighted(i)}
-                      onClick={() => selectSymbol(symbol)}
-                      className={`cursor-pointer px-3 py-2 text-sm transition-colors ${
-                        highlighted === i ? "bg-zinc-600" : ""
-                      }`}
-                    >
+                      key={symbol} role="option" aria-selected={highlighted === i} onMouseEnter={() => setHighlighted(i)} onClick={() => selectSymbol(symbol)} className={`cursor-pointer px-3 py-2 text-sm transition-colors ${highlighted === i ? "bg-zinc-600" : ""}`}>
                       {highlightMatch(symbol.replace("USDT", ""), search.trim())}
                     </div>
                   ))
@@ -159,10 +159,11 @@ const AiAnalysis = () => {
         </div>
       </div>
       <div>
-        {data && <AiResultsCard {...data} />}
+        {loading ? <p>loading state</p> : data ? <AiResultsCard {...data} /> : null}
       </div>
     </div>
   );
 };
+
 
 export default AiAnalysis;
