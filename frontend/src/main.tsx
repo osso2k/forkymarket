@@ -50,9 +50,9 @@ createRoot(document.getElementById('root')!).render(
     enableShaderEffect={false}
     /> */}
       <Routes >
+        <Route path='/' element={<Homepage />} />
         <Route element={<Layout />}>
-        <Route path='/' element={<Protected><App /></Protected>} />
-        <Route path='/markets' element={<Protected><Homepage /></Protected>} />
+        <Route path='/markets' element={<Protected><App /></Protected>} />
         <Route path='/favs' element={<Protected><Favs /></Protected>} />
         <Route path='/profile' element={<Protected><Profile /></Protected>} />
         </Route>

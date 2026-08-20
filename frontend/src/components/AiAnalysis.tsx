@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import toast from "react-hot-toast";
 import api from "../api";
 import AiResultsCard from "./Markets/AiResultsCard";
+import Loading from "./Loading";
 
 interface Prediction {
   symbol: string;
@@ -49,9 +50,8 @@ const AiAnalysis = () => {
 
   const matches = search.trim() ? allSymbols.filter((s) => s.includes(search.trim().toUpperCase())).slice(0, 5) : [];
 
-    // const [activeChat, setActiveChat] = useState<string | null>()
-  // const [chatHistory, setChatHistory] = useState<Record<string, Array<{role: string, content:string}>>>({})
-  // const [chatInput, setChatInput] = useState<string>("")
+  const [messages, setMessages] = useState<Array<{role: string, content: string}>>([])
+  const [chatInput, setChatInput] = useState("")
 
   useEffect(() => {
     setHighlighted(0);
@@ -66,6 +66,21 @@ const AiAnalysis = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (selected) {
+      const saved = localStorage.getItem(`chat_${selected}`)
+      setMessages(saved ? JSON.parse(saved) : [])
+    } else {
+      setMessages([])
+    }
+  }, [selected]);
+
+  useEffect(() => {
+    if (selected && messages.length > 0) {
+      localStorage.setItem(`chat_${selected}`, JSON.stringify(messages))
+    }
+  }, [messages, selected]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -93,6 +108,8 @@ const AiAnalysis = () => {
     setSearch(symbol.replace("USDT", ""));
     setSelected(symbol);
     setOpen(false);
+    setData(null);
+    setMessages([]);
   };
 
 
@@ -105,8 +122,23 @@ const AiAnalysis = () => {
       setData(predic)
       console.log(response);
     } catch (error) {
-      toast.error("OOPS!! Something went wrong.")
-      console.log((error as Error).message);
+      const msg = (error as any).response?.data?.message || (error as Error).message
+      toast.error(`Analysis failed: ${msg}`)
+      console.error(msg)
+    }
+  }
+
+  const handleSend = async () => {
+    if (!chatInput.trim() || !selected) return
+    const userMsg = { role: "user", content: chatInput.trim() }
+    const updated = [...messages, userMsg]
+    setMessages(updated)
+    setChatInput("")
+    try {
+      const { data } = await api.post("/api/analysis/chat", { symbol: selected, messages: updated })
+      setMessages([...updated, { role: "assistant", content: data.reply }])
+    } catch (error) {
+      toast.error("Failed to get AI response")
     }
   }
 
@@ -159,8 +191,49 @@ const AiAnalysis = () => {
         </div>
       </div>
       <div>
-        {loading ? <p>loading state</p> : data ? <AiResultsCard {...data} /> : null}
+        {loading ? <Loading /> : data ? <AiResultsCard {...data} /> : null}
       </div>
+      {data && selected && (
+        <div className="w-[60%] mx-auto mt-6 mb-8">
+          <h3 className="font-minecraft text-lg mb-3 border-b border-zinc-700 pb-2">
+            Ask about {selected.replace("USDT", "")}
+          </h3>
+          <div className="max-h-80 overflow-y-auto mb-4 space-y-3">
+            {messages.length === 0 && (
+              <p className="text-zinc-500 text-sm font-sans text-center py-4">
+                Ask anything about {selected.replace("USDT", "")}...
+              </p>
+            )}
+            {messages.map((msg, i) => (
+              <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div className={`max-w-[80%] px-4 py-2 rounded-lg text-sm font-sans ${
+                  msg.role === "user"
+                    ? "bg-mauve-700 text-white"
+                    : "bg-zinc-700 text-zinc-200"
+                }`}>
+                  {msg.content}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <input
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              className="flex-1 bg-zinc-700 rounded px-3 py-2 text-sm font-sans"
+              placeholder="Ask about this coin..."
+            />
+            <button
+              onClick={handleSend}
+              disabled={!chatInput.trim()}
+              className="px-4 py-2 bg-mauve-700 border rounded text-sm font-sans disabled:opacity-40 cursor-pointer"
+            >
+              Send
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -24,8 +24,20 @@ export const predictSymbols = async (req: Request, res:Response)=>{
         // const socialData = await socialSentiment.json()
 
 
-        const coinData = getPrices()[symbol]
-        if (!coinData) return res.status(404).json({message: `No data for symbol, ${symbol}`})
+        let coinData = getPrices()[symbol]
+        if (!coinData) {
+            try {
+                const tickerRes = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`)
+                const ticker = await tickerRes.json()
+                coinData = {
+                    price: ticker.lastPrice,
+                    changePct: ticker.priceChangePercent,
+                    volume: ticker.quoteVolume
+                }
+            } catch {
+                return res.status(404).json({message: `No data for symbol, ${symbol}`})
+            }
+        }
         
         try {
             let headlines = "No recent news..."
@@ -36,7 +48,7 @@ export const predictSymbols = async (req: Request, res:Response)=>{
                     headlines = news.slice(0,5).map((n: any) => n.headline).join("\n")
                 }
             } catch (error) {
-                return res.status(500).json({message: "Couldnt get news for symbol" , err: (error as Error).message})
+                console.error("News fetch failed:", (error as Error).message)
             }
             const response = await openai.chat.completions.create({
                 model: "openai/gpt-4o-mini",
@@ -62,19 +74,23 @@ export const predictSymbols = async (req: Request, res:Response)=>{
     }
 }
 export const analysisChat = async (req: Request, res: Response)=>{
-    const {symbol , messages } = req.body
-    if(!symbol || !messages) return res.status(400).json({message: "Invalid Information"})
+    try {
+        const {symbol , messages } = req.body
+        if(!symbol || !messages) return res.status(400).json({message: "Invalid Information"})
 
-    const coinData = getPrices()[symbol]
-    if (!coinData) return res.status(400).json({message: "Data not Found"})
-    
-    const contextMsg = {
-        role: "system",
-        content: `Current data for ${symbol}: Price ${coinData.price}, 24h Change ${coinData.changePct}. Be concise, and very thoughtdful for the user.`
+        const coinData = getPrices()[symbol]
+        if (!coinData) return res.status(400).json({message: "Data not Found"})
+        
+        const contextMsg = {
+            role: "system",
+            content: `Current data for ${symbol}: Price ${coinData.price}, 24h Change ${coinData.changePct}. Be concise, and very thoughtdful for the user.`
+        }
+        const response = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [contextMsg, ...messages]
+        })
+        res.json({reply: response.choices[0].message.content})
+    } catch (error) {
+        res.status(500).json({message: "Chat failed", err: (error as Error).message})
     }
-    const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [contextMsg, ...messages]
-    })
-    res.json({reply: response.choices[0].message.content})
 }

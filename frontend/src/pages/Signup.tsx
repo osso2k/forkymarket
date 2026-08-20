@@ -32,7 +32,7 @@ const Signup = () => {
             localStorage.setItem("user", JSON.stringify(response.data.user))
             localStorage.setItem("token", response.data.token)
 
-            navigate("/")
+            navigate("/markets")
 
         } catch (error) {
             console.log("Error in sending user data to server... (signup)", (error as Error).message);

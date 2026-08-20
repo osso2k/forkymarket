@@ -18,7 +18,7 @@ export const Protected = ({children}:PropsWithChildren) => {
 export const ProtectedAuth = ({children}:PropsWithChildren)=>{
     const token = localStorage.getItem("token")
     if(token){
-        return <Navigate to={"/"} replace/>
+        return <Navigate to={"/markets"} replace/>
     }
     return children;
 }

@@ -29,7 +29,7 @@ const Login = () => {
                 localStorage.setItem("userId", response.data.user.userID)
                 localStorage.setItem("user", JSON.stringify(response.data.user))
                 localStorage.setItem("token", response.data.token)
-                navigate("/")
+                navigate("/markets")
                 return
             }else{
                 toast.error("Invalid Credentials..")
