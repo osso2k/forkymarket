@@ -2,6 +2,8 @@
 
 A full-stack real-time cryptocurrency market dashboard with AI-powered analysis. Stream live Binance prices, get AI predictions on whether a coin will go up or down, and chat with an AI analyst about any coin.
 
+![Forkymarket Screenshot](frontend/src/assets/forkymarket.jpeg)
+
 ## Features
 
 - **Live Prices** — streams all USDT trading pairs from Binance via WebSocket, updating every 2 seconds
