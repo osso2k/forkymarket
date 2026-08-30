@@ -1,9 +1,10 @@
 import {Router} from 'express'
 import { getuser, login, signup } from '../controllers/authController'
+import { authLimiter } from '../middleware/rateLimiter'
 
 const authRouter = Router()
-authRouter.get('/user',getuser)
-authRouter.post('/signup',signup)
-authRouter.post('/login', login)
+authRouter.get('/user', authLimiter,getuser)
+authRouter.post('/signup',authLimiter, signup)
+authRouter.post('/login', authLimiter,login)
 
 export default authRouter

@@ -10,7 +10,7 @@ import { protectedRoute } from './middleware/authMiddleware';
 import favsRouter from './routes/favsRoutes';
 import newsRouter from './routes/newsRoutes';
 import analysisRouter from './routes/analysisRoutes';
-
+import { apiLimiter } from './middleware/rateLimiter';
 
 dotenv.config()
 
@@ -19,6 +19,7 @@ const PORT = process.env.PORT || 3030;
 
 app.use(express.json())
 app.use(cors())
+app.use('/api', apiLimiter)
 
 await connectDB()
 await uuidGen()

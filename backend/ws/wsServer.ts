@@ -1,53 +1,54 @@
 import type { Server } from "node:http";
 import { WebSocket, WebSocketServer } from "ws";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
-const HEARTBEAT_INTERVAL = 1000 * 10
-const HEARTBEAT_VALUE = 67
+dotenv.config()
 
+const AUTH_TIMEOUT = 5000
+const ALLOWED_ORIGINS = (process.env.FRONTEND_ORIGIN || "http://localhost:5173").split(",")
 
-// const ping = async (ws: WebSocket) => {
-//     ws.send(HEARTBEAT_VALUE, {binary:true})
-// }
 const wsServer = (server: Server) => {
     const wss = new WebSocketServer({server, maxPayload: 1024 * 1024})
 
-    wss.on("connection", (socket)=>{
-        socket.isAlive = true
-        socket.on("message",(data /*, isBinary*/)=>{
-            // if (isBinary && (data as any)[0] === HEARTBEAT_VALUE ){
-            //     console.log('pong');
-            //     socket.isAlive = true
-                 
-            // }else{
-                const message = data.toString()
-                console.log({message});
-    
-                wss.clients.forEach((client)=>{
-                    if (client.readyState == WebSocket.OPEN){
-                        client.send(JSON.stringify({type:"broadcast" ,message:`Server Broadcast: ${message}`}))
-                    }
-                })
-            // }
+    wss.on("connection", (socket, request) => {
+        socket.isAuthenticated = false
+
+        const origin = request.headers.origin
+        if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+            socket.close(1008, "Origin not allowed")
+            return
+        }
+
+        const authTimer = setTimeout(() => {
+            if (!socket.isAuthenticated) {
+                socket.close(1008, "Authentication timeout")
+            }
+        }, AUTH_TIMEOUT)
+
+        socket.on("message", (data) => {
+            try {
+                const msg = JSON.parse(data.toString())
+                if (msg.type === "auth") {
+                    const decoded = jwt.verify(msg.token, process.env.JWT_SECRET!) as jwt.JwtPayload
+                    socket.isAuthenticated = true
+                    console.log(`WS authenticated: ${decoded.id}`)
+                    clearTimeout(authTimer)
+                }
+            } catch {
+                socket.close(1008, "Invalid authentication")
+            }
         })
-        socket.on("error",(err)=>{
-            console.log(`Err: `,err.message);
+
+        socket.on("error", (err) => {
+            console.log(`Err: `, err.message)
         })
-        socket.on("close",()=>{
-            console.log(`Server Disconnected...`);
+        socket.on("close", () => {
+            clearTimeout(authTimer)
+            console.log(`Server Disconnected...`)
         })
     })
-    // const Interval = setInterval(()=>{
-    //     console.log('ping');
-    //     wss.clients.forEach((client)=>{
-    //         if (!client.isAlive){
-    //             client.terminate()
-    //             return
-    //         }else{
-    //             client.isAlive = false
-    //             ping(client)
-    //         }
-    //     })
-    // }, HEARTBEAT_INTERVAL)
+
     return wss
 }
 

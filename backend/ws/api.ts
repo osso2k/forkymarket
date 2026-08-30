@@ -27,7 +27,7 @@ export const apiServer = async (wss:WebSocketServer) =>{
     setInterval(()=>{
         if (Object.keys(prices).length === 0) return
         wss.clients.forEach((client)=>{
-            if (client.readyState === WebSocket.OPEN){
+            if (client.readyState === WebSocket.OPEN && client.isAuthenticated){
                 client.send(JSON.stringify({ type :"prices", data:prices}))
             }
         })

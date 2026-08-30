@@ -16,8 +16,12 @@ export const protectedRoute = (req:Request,res:Response, next:NextFunction)=>{
     }
 
     const token = authHeader.split(" ")[1]
-    const decoded = jwt.verify(token,process.env.JWT_SECRET!) as JwtPayload & {id:string}
+    try {
+        const decoded = jwt.verify(token,process.env.JWT_SECRET!) as JwtPayload & {id:string}
+        req.user = decoded
+        next()
+    } catch (error) {
+        return res.status(401).json({message: "Invaliod token"})
+    }
 
-    req.user = decoded
-    next()
 }

@@ -65,6 +65,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/forkymarket
 JWT_SECRET=your_jwt_secret
 OPENROUTER_API_KEY=your_openrouter_key
 FINNHUB_API_KEY=your_finnhub_key
+FRONTEND_ORIGIN=http://localhost:5173
 ```
 
 ## Project Structure
@@ -95,7 +96,7 @@ forkymarket/
 ## How It Works
 
 1. **Binance WebSocket** connects to `wss://stream.binance.com:9443/ws/!miniTicker@arr`, filters USDT pairs, and broadcasts prices to connected clients every 2 seconds
-2. **Frontend** receives prices via WebSocket and stores them in React state. The search dropdown fetches the full coin list from Binance's exchangeInfo API (one-time fetch, cached)
+2. **Frontend** receives prices via WebSocket and stores them in React state. WebSocket connections are JWT-authenticated, and the search dropdown fetches the full coin list from Binance's exchangeInfo API (one-time fetch, cached)
 3. **AI Predict** sends the coin symbol to the backend, which fetches live price data (from the WS store or Binance REST fallback) + Finnhub news, then calls OpenRouter's GPT-4o-mini to generate a COP/DROP prediction
 4. **AI Chat** sends the conversation history + coin context to OpenRouter, which responds with analysis
 5. **Auth** uses JWT tokens stored in localStorage, with axios interceptors attaching the token to every request and redirecting to login on 401
