@@ -23,6 +23,7 @@ const Homepage = () => {
                 >
                     Log in
                 </span>
+                <p className="max-w-[70%] text-center text-zinc-400">The output is made with the help of AI, this is not financial advice. The owner of forkymarket is not liable for any infringments and/or future losses.</p>
             </div>
         </div>
     )
