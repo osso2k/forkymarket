@@ -1,4 +1,5 @@
 import { usePricesStore } from "../../stores/usePricesStore"
+import Loading from "../Loading"
 
 
 const DisplayTop7 = () => {
@@ -12,7 +13,7 @@ const DisplayTop7 = () => {
           <span className="text-xl">{symbol.replace("USDT",'')}</span>
           <span className="flex min-w-[50%] font-sans text-xl">${Number(price.price)}</span>
         </div>
-      )) : <><div>Hey</div></>}
+      )) : <Loading />}
     </div>
     
   )

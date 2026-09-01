@@ -1,4 +1,5 @@
 import { usePricesStore } from "../../stores/usePricesStore"
+import Loading from "../Loading"
 
 
 const Gainers = () => {
@@ -16,7 +17,7 @@ const Gainers = () => {
                 <p className="font-minecraft pr-2 flex my-auto">  {`-->`} </p>
                 <p className={`font-sans text-md flex my-auto text-xl ${Number(price.changePct) >= 0 ? 'text-green-400' : 'text-red-400'}`}>%{price.changePct}</p>
             </div>
-        ) ) : <><p className="mx-auto my-auto">Fetching...</p></>}
+        ) ) :  <Loading/>}
     </div>
   )
 }
