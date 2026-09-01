@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 dotenv.config()
 
 const AUTH_TIMEOUT = 5000
-const ALLOWED_ORIGINS = (process.env.FRONTEND_ORIGIN || "http://localhost:5173").split(",")
+const ALLOWED_ORIGINS = (process.env.FRONTEND_URL || "http://localhost:5173").split(",")
 
 const wsServer = (server: Server) => {
     const wss = new WebSocketServer({server, maxPayload: 1024 * 1024})
