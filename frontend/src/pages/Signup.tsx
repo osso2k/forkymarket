@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import api from "../api";
 import toast from "react-hot-toast";
+import Loading from "../components/Loading";
 interface Form {
     username:string;
     password:string;
@@ -9,7 +10,7 @@ interface Form {
 
 const Signup = () => {
     const navigate = useNavigate()
-    // const [loading,setLoading] = useState<boolean>(false);
+    const [loading,setLoading] = useState<boolean>(false);
     const [form,setForm] = useState<Form>({username:"" , password:""})
 
     const handleChange = (e:React.ChangeEvent<HTMLInputElement>)=>{
@@ -25,6 +26,7 @@ const Signup = () => {
                 toast.error("password too  short")
                 return 
             } 
+            setLoading(true)
             const response = await api.post("/api/auth/signup",form)
             toast.success("Signed up!")
 
@@ -33,8 +35,9 @@ const Signup = () => {
             localStorage.setItem("token", response.data.token)
 
             navigate("/markets")
-
         } catch (error) {
+            setLoading(false)
+            toast.error("Error in signing up...")
             console.log("Error in sending user data to server... (signup)", (error as Error).message);
         }
     }
@@ -46,7 +49,7 @@ const Signup = () => {
                 <h1 className="font-minecraft text-2xl pt-12 pl-10">Forkymarket</h1>
                 <p className="font-mono text-lg my-auto pt-7 pr-10  text-zinc-600">Sign up</p>
             </div>
-        <div className="pt-24 flex flex-col flex-wrap">
+        {loading ? <Loading/> : <div className="pt-24 flex flex-col flex-wrap">
             <form onSubmit={handleSubmit} action="">
                 <div className="flex pl-[20%] p-1">  
                     <label className="font-minecraft my-auto pr-3" >username: </label>
@@ -62,7 +65,7 @@ const Signup = () => {
             <p className=" pt-10 ">Already have an account?</p>
             <span onClick={()=>{navigate("/login")}} className="font-minecraft font-semibold cursor-pointer"> Log in.</span>
             </div>
-        </div>
+        </div>}
         </div>
     </div>
   )

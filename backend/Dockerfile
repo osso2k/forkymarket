@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 3030
 
-CMD ["npm", "start"]
+CMD ["node", "--import", "tsx", "index.tx"]
